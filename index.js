@@ -81,19 +81,19 @@ app.get("/cust/system/profile", (req, res, next) => {
 
 app.use("/", (err, req, res, next) => {
   if (err) {
-    res.status(500).send("something went wrong! contact to support");//TODO - error handling middleware it doesn't work here 
+    res.status(500).send("something went wrong! contact to support"); //TODO - error handling middleware it doesn't work here
   }
 });
 
 app.post("/cust/system/applications", (req, res, next) => {
   // try { //TODO - If we use try catch here then error handling middleware will not work
-    const data = req.body;
-    console.log(data);
-    if (!data.company) {
-      throw new Error("company name is required");
-    }
-    console.log("user application is being checked" + " " + data.company);
-    res.send("getting user applications" + " " + data.company);
+  const data = req.body;
+  console.log(data);
+  if (!data.company) {
+    throw new Error("company name is required");
+  }
+  console.log("user application is being checked" + " " + data.company);
+  res.send("getting user applications" + " " + data.company);
   // } catch (err) {
   //   res.status(500).send("internal server error");
   // }
@@ -115,6 +115,26 @@ app.get("/users/cart", userAuth, (req, res, next) => {
 // app.get("/profile/getData" , (req,res)=>{
 //   res.send("this is my profile data");
 // })
+
+//? Task -1
+
+app.use((req, res, next) => {
+  console.log("Auth check in progress...");
+
+  const queryAdmin = req.query.admin;
+  if (queryAdmin) {
+    next();
+  } else {
+    res.status(401).send("Access denied. Admins only");
+  }
+});
+
+app.get("/dashboard", (req, res, next) => {
+  console.log("This is dashbard");
+  res.send("Welcome to dashboard");
+});
+
+
 
 app.listen(5678, () => {
   console.log("server running on localhost:5678");
