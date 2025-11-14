@@ -77,19 +77,38 @@ app.use("/cust/system", userAuth); //TODO - HERE  userAuth is middleware In this
 app.get("/cust/system/profile", (req, res, next) => {
   console.log("user profile is being fetched");
   res.send("getting user profile data");
- 
-});
-app.post("/cust/system/applications" , (req,res,next)=>{
-  const data = req.body;
-  console.log(data);
-  console.log("user application is being checked" + " "+data.company);
-  res.send("getting user applications" + " "+data.company);
 });
 
-app.get("/users/cart" , userAuth, (req,res,next)=>{
+app.use("/", (err, req, res, next) => {
+  if (err) {
+    res.status(500).send("something went wrong! contact to support");//TODO - error handling middleware it doesn't work here 
+  }
+});
+
+app.post("/cust/system/applications", (req, res, next) => {
+  // try { //TODO - If we use try catch here then error handling middleware will not work
+    const data = req.body;
+    console.log(data);
+    if (!data.company) {
+      throw new Error("company name is required");
+    }
+    console.log("user application is being checked" + " " + data.company);
+    res.send("getting user applications" + " " + data.company);
+  // } catch (err) {
+  //   res.status(500).send("internal server error");
+  // }
+});
+
+app.use((err, req, res, next) => {
+  if (err) {
+    res.status(500).send("something went wrong! contact to support"); //TODO - error handling middleware it works here not before the error happen
+  }
+});
+
+app.get("/users/cart", userAuth, (req, res, next) => {
   console.log("Cart items");
   res.send("These are the cart items");
-})
+});
 
 // app.get("/profile", verifyUser);
 
