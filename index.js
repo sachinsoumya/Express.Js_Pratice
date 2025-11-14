@@ -1,33 +1,101 @@
 const express = require("express");
 
+const { verifyUser, userAuth } = require("./middleware/auth");
+
 const app = express();
 
 app.use(express.json());
 
+function logger(req, res, next) {
+  // console.log(req);
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+}
+
+// app.use(logger);
+
+// app.use("/" , (req,res,next)=>{
+//      console.log("This is middleware")
+//     next();
+// })
+
+app.get("/", (req, res, next) => {
+  //   res.send("Hello world Sachin! Express is running🚀");
+  console.log("Hello world Sachin! Express is running🚀");
+  next();
+});
+
 app.get("/", (req, res) => {
-  res.send("Hello world Sachin! Express is running🚀");
+  res.send("This is get number 2 for middleware");
 });
 
-app.get("/about" , (req,res)=>{
-    res.send("This is about route")
+app.get("/about", (req, res) => {
+  res.send("This is about route");
 });
 
-app.get("/contact" , (req,res)=>{
-    res.send("This is contact route");
-})
-
-app.get("/user/:id" , (req,res)=>{
-    res.send("This is user route" + " "+req.params.id); //* Route parameters
+app.get("/contact", (req, res) => {
+  res.send("This is contact route");
 });
 
-app.post("/users" , (req,res)=>{
-    const user = req.body;
-    res.send(`user created : ${user.name}`); //* Post request passing data through request body.
+app.get("/user/:id", (req, res) => {
+  res.send("This is user route" + " " + req.params.id); //* Route parameters
+});
+
+app.post("/users", (req, res) => {
+  const user = req.body;
+  res.send(`user created : ${user.name}`); //* Post request passing data through request body.
+});
+
+app.get("/search", (req, res) => {
+  res.send("Searching for name" + " " + req.query.name + " " + req.query.age); //* Query parameters
+});
+
+app.use("/profile", verifyUser, (req, res, next) => {
+  // res.send("./profile");
+  console.log("./profile");
+  next();
+}); //TODO - verifyUser is the middleware function.
+
+app.get("/profile/analytics", (req, res, next) => {
+  console.log("Thi is profile analytics data");
+  res.send("response for profile analytic data");
+});
+
+app.use("/profile/bio", (req, res, next) => {
+  console.log("This is profile bio information");
+  // res.send("response for bio data");
+  next();
+});
+
+app.get("/profile/bio/posts", (req, res, next) => {
+  console.log("This is profile post information");
+  res.send("response for bio-posts data");
+});
+
+app.use("/cust/system", userAuth); //TODO - HERE  userAuth is middleware In this way we can put middleware but remember it will be app.use()
+
+app.get("/cust/system/profile", (req, res, next) => {
+  console.log("user profile is being fetched");
+  res.send("getting user profile data");
+ 
+});
+app.post("/cust/system/applications" , (req,res,next)=>{
+  const data = req.body;
+  console.log(data);
+  console.log("user application is being checked" + " "+data.company);
+  res.send("getting user applications" + " "+data.company);
+});
+
+app.get("/users/cart" , userAuth, (req,res,next)=>{
+  console.log("Cart items");
+  res.send("These are the cart items");
 })
 
-app.get("/search" , (req,res)=>{
-    res.send("Searching for name" + " "+req.query.name + " "+req.query.age); //* Query parameters 
-})
+// app.get("/profile", verifyUser);
+
+// app.get("/profile/getData" , (req,res)=>{
+//   res.send("this is my profile data");
+// })
 
 app.listen(5678, () => {
   console.log("server running on localhost:5678");
