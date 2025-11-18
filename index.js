@@ -5,6 +5,7 @@ const { verifyUser, userAuth } = require("./middleware/auth");
 const app = express();
 
 app.use(express.json());
+app.use("/static" ,express.static("public"));
 
 function logger(req, res, next) {
   // console.log(req);
@@ -139,3 +140,8 @@ app.get("/dashboard", (req, res, next) => {
 app.listen(5678, () => {
   console.log("server running on localhost:5678");
 });
+
+
+//* Serving static files
+
+
