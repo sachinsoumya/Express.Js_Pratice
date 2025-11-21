@@ -4,8 +4,25 @@ const { verifyUser, userAuth } = require("./middleware/auth");
 
 const app = express();
 
+const peopleRouter = require("./routes/userRouter");
+
+const productRouter = require("./routes/productRouter");
+
+const authRouter = require("./routes/authRouter");
+
+
 app.use(express.json());
+
+
+
+
+app.use("/people" , peopleRouter);
+app.use('/products' , productRouter);
+
+app.use("/", authRouter);
 app.use("/static" ,express.static("public"));
+
+
 
 function logger(req, res, next) {
   // console.log(req);
@@ -119,16 +136,17 @@ app.get("/users/cart", userAuth, (req, res, next) => {
 
 //? Task -1
 
-app.use((req, res, next) => {
-  console.log("Auth check in progress...");
+// app.use((req, res, next) => {
+//   console.log("Auth check in progress...");
 
-  const queryAdmin = req.query.admin;
-  if (queryAdmin) {
-    next();
-  } else {
-    res.status(401).send("Access denied. Admins only");
-  }
-});
+//   const queryAdmin = req.query.admin;
+//   console.log(queryAdmin);
+//   if (queryAdmin) {
+//     next();
+//   } else {
+//     res.status(401).send("Access denied. Admins only");
+//   }
+// });
 
 app.get("/dashboard", (req, res, next) => {
   console.log("This is dashbard");
