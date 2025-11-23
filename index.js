@@ -2,6 +2,8 @@ const express = require("express");
 
 const { verifyUser, userAuth } = require("./middleware/auth");
 
+const { errorHandler } = require ("./middleware/errorHandler");
+
 const app = express();
 
 const peopleRouter = require("./routes/userRouter");
@@ -11,18 +13,14 @@ const productRouter = require("./routes/productRouter");
 const authRouter = require("./routes/authRouter");
 
 
+
 app.use(express.json());
 
-
-
-
-app.use("/people" , peopleRouter);
-app.use('/products' , productRouter);
+app.use("/people", peopleRouter);
+app.use("/products", productRouter);
 
 app.use("/", authRouter);
-app.use("/static" ,express.static("public"));
-
-
+app.use("/static", express.static("public"));
 
 function logger(req, res, next) {
   // console.log(req);
@@ -97,11 +95,14 @@ app.get("/cust/system/profile", (req, res, next) => {
   res.send("getting user profile data");
 });
 
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("something went wrong! contact to support"); //TODO - error handling middleware it doesn't work here
-  }
-});
+
+
+
+// app.use("/", (err, req, res, next) => {
+//   if (err) {
+//     res.status(500).send("something went wrong! contact to support"); //TODO - error handling middleware it doesn't work here
+//   }
+// });
 
 app.post("/cust/system/applications", (req, res, next) => {
   // try { //TODO - If we use try catch here then error handling middleware will not work
@@ -117,9 +118,31 @@ app.post("/cust/system/applications", (req, res, next) => {
   // }
 });
 
+
+
+app.get("/test", (req, res, next) => {
+  next(new Error("This is test error"));
+});
+
+app.use(errorHandler);
+
+
+app.use((err, req, res, next) => {
+  console.error("Error message:", err.message);
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message,
+  }); //* here we can use res.json to send json response
+ 
+});
+
+
+
 app.use((err, req, res, next) => {
   if (err) {
-    res.status(500).send("something went wrong! contact to support"); //TODO - error handling middleware it works here not before the error happen
+    res
+      .status(500)
+      .send("something went wrong! contact to support" + " " + err.message); //TODO - error handling middleware it works here not before the error happen
   }
 });
 
@@ -160,6 +183,6 @@ app.listen(5678, () => {
 });
 
 
+
+
 //* Serving static files
-
-
